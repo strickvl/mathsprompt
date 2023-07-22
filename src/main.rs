@@ -21,12 +21,9 @@ struct FormData {
 }
 
 async fn insert_question_and_variants(form: web::Json<FormData>) -> impl Responder {
-    let (client, connection) = tokio_postgres::connect(
-        "postgresql://strickvl:alex@localhost:5432/mathsprompt",
-        NoTls,
-    )
-    .await
-    .unwrap();
+    let database_url =
+        std::env::var("MATHSPROMPT_DATABASE_URL").expect("MATHSPROMPT_DATABASE_URL must be set");
+    let (client, connection) = tokio_postgres::connect(&database_url, NoTls).await.unwrap();
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
@@ -118,12 +115,9 @@ async fn insert_question_and_variants(form: web::Json<FormData>) -> impl Respond
 }
 
 async fn get_random_question() -> impl Responder {
-    let (client, connection) = tokio_postgres::connect(
-        "postgresql://strickvl:alex@localhost:5432/mathsprompt",
-        NoTls,
-    )
-    .await
-    .unwrap();
+    let database_url =
+        std::env::var("MATHSPROMPT_DATABASE_URL").expect("MATHSPROMPT_DATABASE_URL must be set");
+    let (client, connection) = tokio_postgres::connect(&database_url, NoTls).await.unwrap();
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
@@ -182,12 +176,9 @@ async fn get_random_question() -> impl Responder {
 }
 
 async fn submit_answer(answer: web::Json<Answer>) -> impl Responder {
-    let (client, connection) = tokio_postgres::connect(
-        "postgresql://strickvl:alex@localhost:5432/mathsprompt",
-        NoTls,
-    )
-    .await
-    .unwrap();
+    let database_url =
+        std::env::var("MATHSPROMPT_DATABASE_URL").expect("MATHSPROMPT_DATABASE_URL must be set");
+    let (client, connection) = tokio_postgres::connect(&database_url, NoTls).await.unwrap();
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
@@ -223,12 +214,9 @@ async fn submit_answer(answer: web::Json<Answer>) -> impl Responder {
 }
 
 async fn get_all_tags() -> impl Responder {
-    let (client, connection) = tokio_postgres::connect(
-        "postgresql://strickvl:alex@localhost:5432/mathsprompt",
-        NoTls,
-    )
-    .await
-    .unwrap();
+    let database_url =
+        std::env::var("MATHSPROMPT_DATABASE_URL").expect("MATHSPROMPT_DATABASE_URL must be set");
+    let (client, connection) = tokio_postgres::connect(&database_url, NoTls).await.unwrap();
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
@@ -244,12 +232,9 @@ async fn get_all_tags() -> impl Responder {
 }
 
 async fn get_random_question_by_tag(tag_name: web::Path<String>) -> impl Responder {
-    let (client, connection) = tokio_postgres::connect(
-        "postgresql://strickvl:alex@localhost:5432/mathsprompt",
-        NoTls,
-    )
-    .await
-    .unwrap();
+    let database_url =
+        std::env::var("MATHSPROMPT_DATABASE_URL").expect("MATHSPROMPT_DATABASE_URL must be set");
+    let (client, connection) = tokio_postgres::connect(&database_url, NoTls).await.unwrap();
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
