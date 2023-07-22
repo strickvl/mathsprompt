@@ -6,6 +6,7 @@ use async_openai::{
 use actix_web::{middleware, web, App, HttpResponse, HttpServer, Responder};
 
 use serde::Deserialize;
+use serde_json::json;
 use tokio_postgres::NoTls;
 
 #[macro_use]
@@ -106,6 +107,31 @@ async fn insert_question_and_variants(form: web::Json<FormData>) -> impl Respond
     HttpResponse::Ok().body("Question and variants added successfully!")
 }
 
+async fn get_random_question() -> impl Responder {
+    let (client, connection) = tokio_postgres::connect(
+        "postgresql://strickvl:alex@localhost:5432/mathsprompt",
+        NoTls,
+    )
+    .await
+    .unwrap();
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
+
+    let row = client
+        .query_one("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", &[])
+        .await
+        .unwrap();
+    let question_text: String = row.get("text");
+
+    println!("Sending question: {}", question_text); // Logging the question for debugging
+
+    HttpResponse::Ok().json(json!({ "text": question_text })) // return a JSON object
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
@@ -118,6 +144,7 @@ async fn main() -> std::io::Result<()> {
                     .add(("Access-Control-Allow-Headers", "Content-Type")),
             )
             .route("/", web::post().to(insert_question_and_variants))
+            .route("/random", web::get().to(get_random_question))
     })
     .bind("127.0.0.1:8080")?
     .run()

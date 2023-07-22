@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Maths Prompt</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'Input')">Input</button>
+        <button class="tablinks" onclick="openTab(event, 'Review')" id="defaultOpen">Review</button>
+    </div>
+
+    <div id="Input" class="tabcontent">
+        <div class="container">
+            <form id="myForm">
+                <h2>Maths Prompt Input</h2>
+                <label for="question">Question Text:</label><br>
+                <textarea id="question" name="question"></textarea><br>
+                <label for="tags">Tags (comma-separated):</label><br>
+                <input type="text" id="tags" name="tags"><br>
+                <input type="button" value="Submit" onclick="submitForm()">
+                <input type="button" value="Clear" onclick="clearForm()">
+            </form>
+        </div>
+    </div>
+
+    <div id="Review" class="tabcontent">
+        <div class="container">
+            <h2>Maths Review</h2>
+            <div id="reviewBox" class="review-box">
+                Find all the solutions between 0◦ and 360◦ of the following equations. Give your answers to the nearest degree.
+                (a) sinθ = 0.2 (b) cosθ = −0.6
+            </div>
+            <div class="review-buttons">
+                <input type="button" class="review-button" value="Again" style="background-color:red;">
+                <input type="button" class="review-button" value="Hard" style="background-color:black;color:white;">
+                <input type="button" class="review-button" value="Good" style="background-color:darkgreen;color:white;">
+                <input type="button" class="review-button" value="Easy" style="background-color:lightgreen;">
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
