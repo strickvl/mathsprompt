@@ -64,8 +64,11 @@
         }
 
         function submitForm() {
-            const text = document.getElementById("question").value;
-            const tags = document.getElementById("tags").value;
+            const questionField = document.getElementById("question");
+            const tagsField = document.getElementById("tags");
+        
+            const text = questionField.value;
+            const tags = tagsField.value;
         
             fetch('http://localhost:8080/', {
                 method: 'POST',
@@ -74,9 +77,20 @@
                 },
                 body: JSON.stringify({ text: text, tags: tags }),
             })
-            .then(response => response.text())
-            .then(data => console.log(data))
-            .catch((error) => console.error('Error:', error));
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+                // Clear the question field
+                questionField.value = "";
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
         }
     </script>
 </body>
