@@ -1,5 +1,5 @@
 use actix_web::{web, App, HttpResponse, HttpServer, middleware, Responder};
-use actix_web::http::header;
+
 use serde::Deserialize;
 use tokio_postgres::NoTls;
 
@@ -50,9 +50,9 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(
                 middleware::DefaultHeaders::new()
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Access-Control-Allow-Methods", "GET, POST")
-                    .header("Access-Control-Allow-Headers", "Content-Type")
+                    .add(("Access-Control-Allow-Origin", "*"))
+                    .add(("Access-Control-Allow-Methods", "GET, POST"))
+                    .add(("Access-Control-Allow-Headers", "Content-Type"))
             )
             .route("/", web::post().to(insert_question))
     })
