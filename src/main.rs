@@ -213,6 +213,66 @@ async fn submit_answer(answer: web::Json<Answer>) -> impl Responder {
     HttpResponse::Ok().json(json!({ "status": "success" }))
 }
 
+async fn get_all_tags() -> impl Responder {
+    let (client, connection) = tokio_postgres::connect(
+        "postgresql://strickvl:alex@localhost:5432/mathsprompt",
+        NoTls,
+    )
+    .await
+    .unwrap();
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
+
+    let rows = client.query("SELECT * FROM tags", &[]).await.unwrap();
+
+    let tags: Vec<String> = rows.iter().map(|row| row.get("name")).collect();
+
+    HttpResponse::Ok().json(tags)
+}
+
+async fn get_random_question_by_tag(tag_name: web::Path<String>) -> impl Responder {
+    let (client, connection) = tokio_postgres::connect(
+        "postgresql://strickvl:alex@localhost:5432/mathsprompt",
+        NoTls,
+    )
+    .await
+    .unwrap();
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
+
+    let tag_name_str = tag_name.into_inner();
+
+    let rows = client
+        .query(
+            "SELECT q.id, q.text FROM questions q
+        INNER JOIN question_tag qt ON qt.question_id = q.id
+        INNER JOIN tags t ON t.id = qt.tag_id
+        WHERE t.name = $1
+        ORDER BY RANDOM()
+        LIMIT 1",
+            &[&tag_name_str],
+        )
+        .await
+        .unwrap();
+
+    if !rows.is_empty() {
+        let question_text: String = rows[0].get("text");
+        let question_id: i32 = rows[0].get("id");
+
+        HttpResponse::Ok().json(json!({ "id": question_id, "text": question_text }))
+    } else {
+        HttpResponse::Ok().json(json!({ "status": "no questions found for this tag" }))
+    }
+}
+
 #[derive(serde::Deserialize)]
 struct Answer {
     question_id: i32,
@@ -233,7 +293,9 @@ async fn main() -> std::io::Result<()> {
             )
             .route("/", web::post().to(insert_question_and_variants))
             .route("/random", web::get().to(get_random_question))
-            .route("/submit_answer", web::post().to(submit_answer)) // new route
+            .route("/random/{tag}", web::get().to(get_random_question_by_tag)) // new route
+            .route("/tags", web::get().to(get_all_tags)) // new route
+            .route("/submit_answer", web::post().to(submit_answer))
     })
     .bind("127.0.0.1:8080")?
     .run()

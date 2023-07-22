@@ -44,7 +44,11 @@ function submitAnswer(answeredCorrectly, ease) {
     .then(data => {
         console.log(data);
         // Fetch a new question after submitting the answer
-        fetchRandomQuestion();
+        if (document.getElementById('Review').style.display === 'block') {
+            fetchRandomQuestion();
+        } else if (document.getElementById('Focus').style.display === 'block') {
+            fetchRandomQuestionByTag();
+        }
     })
     .catch((error) => {
         console.error('Error:', error);
@@ -71,6 +75,9 @@ function openTab(evt, tabName) {
     if (tabName === 'Review') {
         fetchRandomQuestion();
     }
+    if (tabName === 'Focus') {
+        fetchTags();
+    }
 }
 
 function fetchRandomQuestion() {
@@ -86,14 +93,64 @@ function fetchRandomQuestion() {
     });
 }
 
+function fetchTags() {
+    fetch('http://localhost:8080/tags')
+        .then(response => response.json())
+        .then(data => {
+            // Sort the tags alphabetically
+            data.sort();
+
+            let dropdown = document.getElementById('tagSelect');
+            dropdown.length = 0;
+
+            // Add a blank option at the top
+            let defaultOption = document.createElement('option');
+            defaultOption.text = '';
+            dropdown.add(defaultOption);
+
+            data.forEach((tag) => {
+                let option = document.createElement('option');
+                option.text = tag;
+                option.value = tag;
+                dropdown.add(option);
+            });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+
+
+
+function fetchRandomQuestionByTag() {
+    let tag = document.getElementById('tagSelect').value;
+    fetch(`http://localhost:8080/random?tag=${tag}`)
+        .then(response => response.json())
+        .then(data => {
+            // Store the question ID and display the question text
+            currentQuestionId = data.id;
+            document.getElementById('focusBox').innerText = data.text;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+
 document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("defaultOpen").click();
 
     document.getElementById("buttonAgain").onclick = function() {submitAnswer(false, 0);};
     document.getElementById("buttonHard").onclick = function() {submitAnswer(true, 1);};
     document.getElementById("buttonGood").onclick = function() {submitAnswer(true, 2);};
     document.getElementById("buttonEasy").onclick = function() {submitAnswer(true, 3);};
 
+    // ... Add event listeners for the new review buttons in the Focus tab ...
+    document.getElementById("focusButtonAgain").onclick = function() {submitAnswer(false, 0);};
+    document.getElementById("focusButtonHard").onclick = function() {submitAnswer(true, 1);};
+    document.getElementById("focusButtonGood").onclick = function() {submitAnswer(true, 2);};
+    document.getElementById("focusButtonEasy").onclick = function() {submitAnswer(true, 3);};
+
     // Fetch the initial question after the page has loaded
+    document.getElementById("defaultOpen").click();
     fetchRandomQuestion();
 });
+

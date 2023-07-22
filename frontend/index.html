@@ -8,6 +8,7 @@
     <div class="tab">
         <button class="tablinks" onclick="openTab(event, 'Input')">Input</button>
         <button class="tablinks" onclick="openTab(event, 'Review')" id="defaultOpen">Review</button>
+        <button class="tablinks" onclick="openTab(event, 'Focus')">Focus</button>
     </div>
 
     <div id="Input" class="tabcontent">
@@ -35,6 +36,23 @@
                 <button id="buttonHard" class="review-button" style="background-color:black;color:white;">Hard</button>
                 <button id="buttonGood" class="review-button" style="background-color:darkgreen;color:white;">Good</button>
                 <button id="buttonEasy" class="review-button" style="background-color:lightgreen;">Easy</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Focus" class="tabcontent">
+        <div class="container">
+            <h2>Maths Focus</h2>
+            <label for="tagSelect">Select Tag:</label><br>
+            <select id="tagSelect" onchange="fetchRandomQuestionByTag()"></select><br>
+            <div id="focusBox" class="review-box">
+                Select a tag to start...
+            </div>
+            <div class="review-buttons">
+                <button id="focusButtonAgain" class="review-button" style="background-color:red;">Again</button>
+                <button id="focusButtonHard" class="review-button" style="background-color:black;color:white;">Hard</button>
+                <button id="focusButtonGood" class="review-button" style="background-color:darkgreen;color:white;">Good</button>
+                <button id="focusButtonEasy" class="review-button" style="background-color:lightgreen;">Easy</button>
             </div>
         </div>
     </div>
