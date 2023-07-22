@@ -126,10 +126,41 @@ async fn get_random_question() -> impl Responder {
         .await
         .unwrap();
     let question_text: String = row.get("text");
+    let question_id: i32 = row.get("id"); // get the question ID
 
-    println!("Sending question: {}", question_text); // Logging the question for debugging
+    println!("Sending question: {}", question_text);
 
-    HttpResponse::Ok().json(json!({ "text": question_text })) // return a JSON object
+    HttpResponse::Ok().json(json!({ "id": question_id, "text": question_text }))
+    // return a JSON object
+}
+async fn submit_answer(answer: web::Json<Answer>) -> impl Responder {
+    let (client, connection) = tokio_postgres::connect(
+        "postgresql://strickvl:alex@localhost:5432/mathsprompt",
+        NoTls,
+    )
+    .await
+    .unwrap();
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
+
+    // Insert the new answer into the question_answers table
+    client.execute(
+        "INSERT INTO question_answers (question_id, answered_correctly, ease, answer_date, created_at) VALUES ($1, $2, $3, NOW(), NOW())",
+        &[&answer.question_id, &answer.answered_correctly, &answer.ease],
+    ).await.unwrap();
+
+    HttpResponse::Ok().json(json!({ "status": "success" }))
+}
+
+#[derive(serde::Deserialize)]
+struct Answer {
+    question_id: i32,
+    answered_correctly: bool,
+    ease: i32,
 }
 
 #[actix_web::main]
@@ -145,6 +176,7 @@ async fn main() -> std::io::Result<()> {
             )
             .route("/", web::post().to(insert_question_and_variants))
             .route("/random", web::get().to(get_random_question))
+            .route("/submit_answer", web::post().to(submit_answer)) // new route
     })
     .bind("127.0.0.1:8080")?
     .run()

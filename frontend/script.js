@@ -32,6 +32,25 @@ function submitForm() {
     });
 }
 
+function submitAnswer(answeredCorrectly, ease) {
+    fetch('http://localhost:8080/submit_answer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question_id: currentQuestionId, answered_correctly: answeredCorrectly, ease: ease }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        // Fetch a new question after submitting the answer
+        fetchRandomQuestion();
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
 function openTab(evt, tabName) {
     var i, tabcontent, tablinks;
 
@@ -49,31 +68,32 @@ function openTab(evt, tabName) {
     evt.currentTarget.className += " active";
 
     // Fetch a random question when the Review tab is opened
-    // Fetch a random question when the Review tab is opened
     if (tabName === 'Review') {
-        console.log('Attempting to fetch a random question...');  // Log for debugging
-        fetch('http://localhost:8080/random')
-        .then(response => {
-            console.log('Received response:', response);  // Log for debugging
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Received data:', data);  // Log for debugging
-            // Assuming the question text is in the 'text' field of the returned object
-            document.getElementById('reviewBox').innerText = data.text;
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+        fetchRandomQuestion();
     }
 }
 
-// Get the element with id="defaultOpen" and click on it
-document.getElementById("defaultOpen").click();
-
-window.onload = function() {
-    document.getElementById("defaultOpen").click();
+function fetchRandomQuestion() {
+    fetch('http://localhost:8080/random')
+    .then(response => response.json())
+    .then(data => {
+        // Store the question ID and display the question text
+        currentQuestionId = data.id;
+        document.getElementById('reviewBox').innerText = data.text;
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("defaultOpen").click();
+
+    document.getElementById("buttonAgain").onclick = function() {submitAnswer(false, 0);};
+    document.getElementById("buttonHard").onclick = function() {submitAnswer(true, 1);};
+    document.getElementById("buttonGood").onclick = function() {submitAnswer(true, 2);};
+    document.getElementById("buttonEasy").onclick = function() {submitAnswer(true, 3);};
+
+    // Fetch the initial question after the page has loaded
+    fetchRandomQuestion();
+});
