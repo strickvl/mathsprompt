@@ -8,6 +8,9 @@ use actix_web::{middleware, web, App, HttpResponse, HttpServer, Responder};
 use serde::Deserialize;
 use tokio_postgres::NoTls;
 
+#[macro_use]
+extern crate log;
+
 #[derive(Deserialize)]
 struct FormData {
     text: String,
@@ -66,12 +69,14 @@ async fn insert_question_and_variants(form: web::Json<FormData>) -> impl Respond
         .build().unwrap();
 
     let response = openai_client.chat().create(request).await.unwrap();
+    let mut questions_added = 0;
 
     for (i, choice) in response.choices.iter().enumerate() {
         // Check if content is Some(String)
         if let Some(content) = &choice.message.content {
             // Split the text into lines
             let lines: Vec<&str> = content.trim().split('\n').collect();
+            questions_added += lines.len();
             for line in lines {
                 // Remove the number prefix
                 let new_question_text = line
@@ -92,12 +97,18 @@ async fn insert_question_and_variants(form: web::Json<FormData>) -> impl Respond
             }
         }
     }
+    info!(
+        "Added {} questions and {} tags to the database",
+        questions_added,
+        tag_ids.len()
+    );
 
     HttpResponse::Ok().body("Question and variants added successfully!")
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init();
     HttpServer::new(move || {
         App::new()
             .wrap(
