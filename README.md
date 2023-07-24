@@ -1,6 +1,6 @@
 # MathsPrompt
 
-![](assets/mp-focus.png)
+<img src="assets/mp-focus.png" width="450">
 
 A simple tool that schedules maths problems to be solved.
 
