@@ -1,8 +1,10 @@
 # MathsPrompt
 
-![](assets/mp-focus.png)
+<img src="assets/mp-focus.png" width="450">
 
 A simple tool that schedules maths problems to be solved.
+
+Read [the associated blog](https://mlops.systems/posts/2023-07-23-maths-prompt-rust-project.html) for more context on the project, why I built it and how it works technically.
 
 ## Input Questions
 
