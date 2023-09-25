@@ -87,6 +87,9 @@ function fetchRandomQuestion() {
         // Store the question ID and display the question text
         currentQuestionId = data.id;
         document.getElementById('reviewBox').innerText = data.text;
+
+        // Tell MathJax to scan the updated DOM for LaTeX code
+        MathJax.typeset();
     })
     .catch((error) => {
         console.error('Error:', error);
@@ -130,6 +133,9 @@ function fetchRandomQuestionByTag() {
             // Store the question ID and display the question text
             currentQuestionId = data.id;
             document.getElementById('focusBox').innerText = data.text;
+            
+            // Tell MathJax to scan the updated DOM for LaTeX code
+            MathJax.typeset();
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -153,4 +159,3 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("defaultOpen").click();
     fetchRandomQuestion();
 });
-
