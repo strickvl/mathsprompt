@@ -11,7 +11,7 @@ Read [the associated blog](https://mlops.systems/posts/2023-07-23-maths-prompt-r
 For the initial input of basis questions, spin up the Rust server from the base
 directory with a simple `cargo run`. This will start the server on port 8000.
 
-Then, open the file at `fontend/index.html` in your browser. (You'll want to 
+Then, open the file at `frontend/index.html` in your browser. (You'll want to 
 set your database URL using the `MATHSPROMPT_DATABASE_URL` environment variable,
 and you'll want to set your OpenAI API key using the `OPENAI_API_KEY`
 environment variable.)
