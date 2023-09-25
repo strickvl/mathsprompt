@@ -51,7 +51,7 @@ async fn insert_question_and_variants(form: web::Json<FormData>) -> impl Respond
 
     // New code to generate variants
     let openai_client = Client::new();
-    let prompt = format!("I have this question:\n\n\"\"\"\n{}\n\"\"\"\n\nAnd I need you to generate 5 new questions that are similar in form, but with different values / variables (as is appropriate). The first should be the question above but reformatted and reworded if necessary to make it clear.\n\nThen give me the 5 generated questions. (So there should be 6 questions at the end). Each question should be separated by 7 @ symbols like: @@@@@@@ so that the returned text can be parsed. IMPORTANT: Just give me the question variations and the delimiter. Don't make any other comments before or afterwards in your response.", form.text);
+    let prompt = format!("I have this question:\n\n\"\"\"\n{}\n\"\"\"\n\nAnd I need you to generate 5 new questions that are similar in form, but with different values / variables (as is appropriate). The first should be the question above but reformatted and reworded if necessary to make it clear.\n\nThen give me the 5 generated questions. (So there should be 6 questions at the end). Each question should be separated by 7 @ symbols like: @@@@@@@ so that the returned text can be parsed. IMPORTANT: Just give me the question variations and the delimiter. Don't make any other comments before or afterwards in your response. ALSO IMPORTANT: any mathematical equations or symbols etc should be written using Latex markup and this inline markup can be denoted with `\\(` before and `\\)` after the Latex text.", form.text);
 
     let request = CreateChatCompletionRequestArgs::default()
         .max_tokens(512_u16)
