@@ -126,18 +126,21 @@ async fn get_random_question() -> impl Responder {
     });
 
     match client
-        .query_opt(
-            "SELECT q.id, q.text FROM questions q
-            INNER JOIN (
-                SELECT question_id, AVG(ease) as avg_ease FROM question_answers
-                GROUP BY question_id
-            ) qa ON qa.question_id = q.id
-            WHERE q.next_due <= NOW() AND qa.avg_ease <= 1
-            ORDER BY RANDOM()
-            LIMIT 1",
-            &[],
+    .query_opt(
+        "SELECT q.id, q.text FROM questions q
+        LEFT JOIN (
+            SELECT question_id, AVG(ease) as avg_ease, MAX(answer_date) as latest_review FROM question_answers
+            GROUP BY question_id
+        ) qa ON qa.question_id = q.id
+        WHERE (
+            (q.next_due <= NOW() AND qa.avg_ease <= 1) OR 
+            (qa.latest_review < NOW() - INTERVAL '7 days')
         )
-        .await
+        ORDER BY RANDOM()
+        LIMIT 1",
+        &[],
+    )
+    .await
     {
         Ok(Some(row)) => {
             let question_text: String = row.get("text");
